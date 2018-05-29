@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Movies App - 2</string>
+    <string name="check_internet_connection">No internet. Please check your internect connection and try again</string>
+    <string name="highest_rating">Highest Rating</string>
+    <string name="most_popular">Most Popular</string>
+    <string name="wish_list">Wish List</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="wishlist">WishList</string>
+    <string name="wishlist_button">WISHLIST</string>
+</resources>
