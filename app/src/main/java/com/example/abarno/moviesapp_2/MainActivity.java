@@ -1,9 +1,11 @@
 package com.example.abarno.moviesapp_2;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -74,6 +76,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             networkMessage.setVisibility(View.VISIBLE);
             listView = findViewById(R.id.movie_view_wishlist);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Do want to exit app?");
+        builder.setCancelable(true);
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     Cursor fetchWishList(){
