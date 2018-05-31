@@ -7,4 +7,5 @@
     <string name="movie_poster">Movie Poster</string>
     <string name="wishlist">WishList</string>
     <string name="wishlist_button">WISHLIST</string>
+    <string name="release_caption">Release:</string>
 </resources>

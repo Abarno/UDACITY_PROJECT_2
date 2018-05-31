@@ -56,7 +56,7 @@ public class MovieWishListContentProvider extends ContentProvider {
                         null,
                         null,
                         null,
-                        sortOrder);
+                        null);
                 break;
 
             default:
@@ -104,8 +104,33 @@ public class MovieWishListContentProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+
+        final SQLiteDatabase sqLiteDatabase = movieDbHelper.getWritableDatabase();
+
+        int uriMatch = sUriMatcher.match(uri);
+
+        int favMoviesDeleted;
+
+        switch (uriMatch) {
+
+            case MOVIES_ID:
+
+                String id = uri.getPathSegments().get(1);
+
+                favMoviesDeleted = sqLiteDatabase.delete(MovieContract.MovieList.TABLE_NAME, MovieContract.MovieList.MOVIE_ID + "=?", new String[]{id});
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+
+        if (favMoviesDeleted != 0) {
+
+            Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
+        }
+
+        return favMoviesDeleted;
     }
 
     @Override

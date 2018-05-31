@@ -45,6 +45,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import static android.app.PendingIntent.getActivity;
 import static android.widget.Toast.LENGTH_LONG;
+import static android.widget.Toast.LENGTH_SHORT;
 
 public class MovieDetailsActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
 
@@ -84,6 +85,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements AdapterVi
 
         SharedPreferences sharedPrefs = getSharedPreferences("com.example.abarno.moviesapp_2", MODE_PRIVATE);
         button.setChecked(sharedPrefs.getBoolean("NameOfMovieToSave", true));
+        button.setBackgroundResource(R.drawable.button_selector);
 
 
         details = (MovieDetails) Objects.requireNonNull(Objects.requireNonNull(getIntent().getExtras()).getParcelable("MOVIE_DETAILS"));
@@ -91,15 +93,15 @@ public class MovieDetailsActivity extends AppCompatActivity implements AdapterVi
         if (details != null){
             Glide.with(this).load("https://image.tmdb.org/t/p/w500/"+details.getMoviePoster()).into(movieImage);
             movieTitle.setText("TITLE : "+details.getMovieTitle());
-            movieVote.setText("RATING : "+Double.toString(details.getVoteAverage()));
-            movieDate.setText("RELEASE : " + details.getReleaseDate());
+            movieVote.setText("RATING : "+Double.toString(details.getVoteAverage()) + "/10");
+            movieDate.setText(details.getReleaseDate());
             movieOverview.setText(details.getMovieOverView());
 
         }
-        String videoURL = "https://api.themoviedb.org/3/movie/"+Integer.toString(details.getId())+"/videos?api_key=d9ac31413f412f924a99457ae2b87cf7&language=en-US";
+        String videoURL = "https://api.themoviedb.org/3/movie/"+Integer.toString(details.getId())+"/videos?api_key=" + BuildConfig.API_KEY + "&language=en-US";
         new FetchTrailers(currentContext).execute(videoURL);
 
-        String reviewURL = "https://api.themoviedb.org/3/movie/"+Integer.toString(details.getId())+"/reviews?api_key=d9ac31413f412f924a99457ae2b87cf7&language=en-US";
+        String reviewURL = "https://api.themoviedb.org/3/movie/"+Integer.toString(details.getId())+"/reviews?api_key=" + BuildConfig.API_KEY + "&language=en-US";
         new FetchReviews(currentContext).execute(reviewURL);
     }
 
@@ -119,32 +121,48 @@ public class MovieDetailsActivity extends AppCompatActivity implements AdapterVi
 
         if(button.isChecked()) {
 
-            SharedPreferences.Editor editor = getSharedPreferences("com.example.abarno.moviesapp_2", MODE_PRIVATE).edit();
-            editor.putBoolean("NameOfMovieToSave", true);
-            editor.apply();
-            view.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
-
+            int movieIdFav = details.getId();
             String movieNameFav = details.getMovieTitle();
             String moviePosterPath = details.getMoviePoster();
             Double movieRatingFav = details.getVoteAverage();
 
             ContentValues contentValues = new ContentValues();
 
+            contentValues.put(MovieContract.MovieList.MOVIE_ID, movieIdFav);
             contentValues.put(MovieContract.MovieList.MOVIE_NAME, movieNameFav);
             contentValues.put(MovieContract.MovieList.MOVIE_POSTER, moviePosterPath);
             contentValues.put(MovieContract.MovieList.MOVIE_RATING, movieRatingFav);
 
+            SharedPreferences.Editor editor = getSharedPreferences("com.example.abarno.moviesapp_2", MODE_PRIVATE).edit();
+            editor.putBoolean("NameOfMovieToSave", true);
+            editor.apply();
+            view.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
+
+
             Uri uri = getContentResolver().insert(MovieContract.MovieList.CONTENT_URI, contentValues);
 
             if(uri != null) {
-                Toast.makeText(MovieDetailsActivity.this, uri.toString(), LENGTH_LONG).show();
+                Toast.makeText(MovieDetailsActivity.this, " Added to Wishlist ", LENGTH_SHORT).show();
             }
         }
         else {
+
+            int movieIdFav = details.getId();
+
             SharedPreferences.Editor editor = getSharedPreferences("com.example.abarno.moviesapp_2", MODE_PRIVATE).edit();
             editor.putBoolean("NameOfMovieToSave", false);
             editor.apply();
             view.setBackgroundResource(R.drawable.ic_favorite_border_black_24dp);
+
+            String stringId = Integer.toString(movieIdFav);
+
+            Uri uri = MovieContract.MovieList.CONTENT_URI;
+            uri = uri.buildUpon().appendPath(stringId).build();
+
+            getContentResolver().delete(uri, null, null);
+
+            Toast.makeText(this, " Removed from Wishlist", LENGTH_SHORT).show();
+
         }
     }
 

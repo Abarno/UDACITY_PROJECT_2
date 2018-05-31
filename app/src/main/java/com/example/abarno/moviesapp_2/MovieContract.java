@@ -16,6 +16,7 @@ public class MovieContract {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH).build();
 
         public static final String TABLE_NAME = "wishList";
+        public static final String MOVIE_ID = "movieId";
         public static final String MOVIE_NAME = "movieName";
         public static final String MOVIE_POSTER = "moviePoster";
         public static final String MOVIE_RATING = "movieRating";

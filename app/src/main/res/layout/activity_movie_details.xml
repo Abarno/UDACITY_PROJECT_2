@@ -30,16 +30,35 @@
                 android:id="@+id/movie_image_details"
                 android:layout_width="200dp"
                 android:layout_height="200dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="10dp"
                 android:layout_marginTop="15dp"
                 android:layout_alignParentLeft="true"/>
+
+            <TextView
+                android:text="@string/release_caption"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="220dp"
+                android:layout_marginTop="70dp"
+                android:textColor="#000000"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/movie_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="220dp"
+                android:layout_marginTop="90dp"
+                android:textColor="#000000"
+                android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/movie_vote"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="250dp"
-                android:layout_marginTop="150dp"
+                android:layout_marginLeft="220dp"
+                android:layout_marginTop="130dp"
                 android:textColor="#000000"
                 android:textSize="15sp" />
 
@@ -47,24 +66,15 @@
                 android:id="@+id/wishlist_button"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="250dp"
+                android:layout_marginLeft="220dp"
                 android:text=""
                 android:textOff=""
                 android:textOn=""
                 android:background="@drawable/ic_favorite_border_black_24dp"
                 android:onClick="favouriteList"
-                android:layout_marginTop="200dp"/>
+                android:layout_marginTop="180dp"/>
 
         </RelativeLayout>
-
-        <TextView
-            android:id="@+id/movie_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:textColor="#000000"
-            android:textSize="15sp" />
 
         <TextView
             android:text="Movie Overview:"

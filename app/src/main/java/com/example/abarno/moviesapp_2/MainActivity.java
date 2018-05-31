@@ -38,16 +38,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import android.os.Parcelable;
+import android.widget.Toast;
 
 import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
-    private String mostpopular = "https://api.themoviedb.org/3/movie/popular?api_key=d9ac31413f412f924a99457ae2b87cf7";
-    private String toprated = "https://api.themoviedb.org/3/movie/top_rated?api_key=d9ac31413f412f924a99457ae2b87cf7";
+    private String mostpopular = BuildConfig.API_KEY_POPULAR_MOVIES;
+    private String toprated = BuildConfig.API_KEY_HIGHEST_RATING_MOVIES;
     private TextView networkMessage;
     private Context currentContext;
     private GridView gridView;
+    private ListView listView;
     private MovieAdapter movieAdapter;
     private ArrayList<MovieDetails> movieDetailsArrayLists = new ArrayList<>();
     private WishListAdapter wishListAdapter;
@@ -60,17 +62,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         networkMessage = findViewById(R.id.network_message);
         currentContext = getApplicationContext();
 
-        wishListAdapter = new WishListAdapter(this,fetchWishList(),0);
-
         if(connectionAvailability()) {
 
             gridView = findViewById(R.id.movie_view);
+            listView = findViewById(R.id.movie_view_wishlist);
             gridView.setOnItemClickListener(this);
 
             new FetchMovies(currentContext).execute(mostpopular);
         }
         else {
             networkMessage.setVisibility(View.VISIBLE);
+            listView = findViewById(R.id.movie_view_wishlist);
         }
     }
 
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 null,
                 null,
                 null,
-                MovieContract.MovieList._ID);
+                null);
     }
 
     public boolean connectionAvailability(){
@@ -133,13 +135,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (connectionAvailability()) {
                 networkMessage.setVisibility(View.INVISIBLE);
                 movieDetailsArrayLists.clear();
-                gridView.setAdapter(wishListAdapter);
+                wishListAdapter = new WishListAdapter(this,fetchWishList(),0);
+                listView.setAdapter(wishListAdapter);
                 wishListAdapter.notifyDataSetChanged();
+                movieAdapter.notifyDataSetChanged();
                 return true;
             }
             else {
                 networkMessage.setVisibility(View.VISIBLE);
-                gridView.setAdapter(wishListAdapter);
+                listView.setAdapter(wishListAdapter);
                 return true;
             }
         }

@@ -4,11 +4,14 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.example.abarno.moviesapp_2"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField("String","API_KEY",API_KEY)
+        buildConfigField("String","API_KEY_POPULAR_MOVIES",API_KEY_POPULAR_MOVIES)
+        buildConfigField("String","API_KEY_HIGHEST_RATING_MOVIES",API_KEY_HIGHEST_RATING_MOVIES)
     }
     buildTypes {
         release {

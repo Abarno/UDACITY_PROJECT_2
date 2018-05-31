@@ -7,7 +7,7 @@
 
     <ImageView
         android:layout_width="151dp"
-        android:layout_height="260dp"
+        android:layout_height="wrap_content"
         android:padding="5dp"
         android:id="@+id/fav_movie_image"
         android:layout_marginStart="10dp" />
