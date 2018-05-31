@@ -44,8 +44,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
-    private String mostpopular = BuildConfig.API_KEY_POPULAR_MOVIES;
-    private String toprated = BuildConfig.API_KEY_HIGHEST_RATING_MOVIES;
+    private String mostpopular = "https://api.themoviedb.org/3/movie/popular?api_key=" + BuildConfig.API_KEY;
+    private String toprated = "https://api.themoviedb.org/3/movie/top_rated?api_key=" + BuildConfig.API_KEY;
     private TextView networkMessage;
     private Context currentContext;
     private GridView gridView;
