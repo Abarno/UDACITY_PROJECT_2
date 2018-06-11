@@ -42,6 +42,6 @@ public class WishListAdapter extends CursorAdapter {
 
         favMovieName.setText(movieTitleFetch);
         favMovieRating.setText(Double.toString(movieRatingFetch));
-        Glide.with(context).load(movieImageFetch).into(favMovieImage);
+        Glide.with(context).load("https://image.tmdb.org/t/p/w92/"+ movieImageFetch).into(favMovieImage);
     }
 }

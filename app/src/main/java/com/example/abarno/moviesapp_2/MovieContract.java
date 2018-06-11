@@ -3,11 +3,11 @@ package com.example.abarno.moviesapp_2;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-public class MovieContract {
+public final class MovieContract {
 
     public static final String AUTHORITY = "com.example.abarno.moviesapp_2";
 
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
+    static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
     public static final String PATH = "movies";
 

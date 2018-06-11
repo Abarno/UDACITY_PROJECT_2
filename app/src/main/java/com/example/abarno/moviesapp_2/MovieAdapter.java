@@ -1,7 +1,9 @@
 package com.example.abarno.moviesapp_2;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -25,6 +27,15 @@ public class MovieAdapter extends BaseAdapter {
         this.context = context;
     }
 
+    public MovieAdapter() {
+
+    }
+
+    static class ViewHolder {
+        TextView movieName;
+        ImageView movieImage;
+    }
+
     @Override
     public int getCount() {
         return movieDetailsArrayList.size();
@@ -45,6 +56,7 @@ public class MovieAdapter extends BaseAdapter {
 
         View gridLayout = view;
         MovieDetails details = movieDetailsArrayList.get(position);
+        ViewHolder holder = new ViewHolder();
 
         if (view == null){
             inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -53,14 +65,13 @@ public class MovieAdapter extends BaseAdapter {
             }
         }
 
-        TextView movieName = gridLayout.findViewById(R.id.movie_name);
-        ImageView movieImage = gridLayout.findViewById(R.id.movie_image);
-     //   TextView movieRate = gridLayout.findViewById(R.id.movie_date);
+        holder.movieName = gridLayout.findViewById(R.id.movie_name);
+        holder.movieImage = gridLayout.findViewById(R.id.movie_image);
 
-        movieName.setText(details.getMovieTitle());
-     //   movieRate.setText(Double.toString(details.getVoteAverage()));
+        holder.movieName.setText(details.getMovieTitle());
+        Glide.with(context).load("https://image.tmdb.org/t/p/w500/"+details.getMoviePoster()).into(holder.movieImage);
 
-        Glide.with(context).load("https://image.tmdb.org/t/p/w500/"+details.getMoviePoster()).into(movieImage);
+        gridLayout.setTag(holder);
 
         return gridLayout;
     }

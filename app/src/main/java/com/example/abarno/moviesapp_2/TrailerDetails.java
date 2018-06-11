@@ -5,9 +5,8 @@ import android.os.Parcelable;
 
 public class TrailerDetails implements Parcelable {
 
-    public TrailerDetails() {
-
-    }
+    private String movieTrailerId;
+    private String movieTrailerKey;
 
     public String getMovieTrailerId() {
         return movieTrailerId;
@@ -25,8 +24,9 @@ public class TrailerDetails implements Parcelable {
         this.movieTrailerKey = movieTrailerKey;
     }
 
-    private String movieTrailerId;
-    private String movieTrailerKey;
+    public TrailerDetails() {
+
+    }
 
     protected TrailerDetails(Parcel in) {
         movieTrailerId = in.readString();

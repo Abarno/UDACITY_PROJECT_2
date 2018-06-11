@@ -1,31 +1,24 @@
 package com.example.abarno.moviesapp_2;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.LoaderManager;
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CursorAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -39,8 +32,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import android.os.Parcelable;
-import android.widget.Toast;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -48,13 +39,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private String mostpopular = "https://api.themoviedb.org/3/movie/popular?api_key=" + BuildConfig.API_KEY;
     private String toprated = "https://api.themoviedb.org/3/movie/top_rated?api_key=" + BuildConfig.API_KEY;
+    private String upcoming = "https://api.themoviedb.org/3/movie/upcoming?api_key=" + BuildConfig.API_KEY;
     private TextView networkMessage;
     private Context currentContext;
     private GridView gridView;
-    private ListView listView;
-    private MovieAdapter movieAdapter;
+    private int id;
+    private MovieAdapter movieAdapter = new MovieAdapter();
     private ArrayList<MovieDetails> movieDetailsArrayLists = new ArrayList<>();
-    private WishListAdapter wishListAdapter;
+    private static final String LIST_STATE = "listState";
+    private static final String TAG = MainActivity.class.getName();
 
 
     @Override
@@ -64,24 +57,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         networkMessage = findViewById(R.id.network_message);
         currentContext = getApplicationContext();
 
-        if(connectionAvailability()) {
+        gridView = findViewById(R.id.movie_view);
+        gridView.setOnItemClickListener(this);
 
-            gridView = findViewById(R.id.movie_view);
-            listView = findViewById(R.id.movie_view_wishlist);
-            gridView.setOnItemClickListener(this);
+        if (connectionAvailability()) {
+            if (savedInstanceState != null) {
+                    movieDetailsArrayLists = savedInstanceState.getParcelableArrayList(LIST_STATE);
+                    movieAdapter = new MovieAdapter(this, movieDetailsArrayLists);
+                    gridView.setAdapter(movieAdapter);
+                    Log.d(TAG, "***state restored***");
+            } else {
+                new FetchMovies(currentContext).execute(mostpopular);
+            }
 
-            new FetchMovies(currentContext).execute(mostpopular);
-        }
-        else {
+        } else {
             networkMessage.setVisibility(View.VISIBLE);
-            listView = findViewById(R.id.movie_view_wishlist);
         }
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(LIST_STATE, movieDetailsArrayLists);
+        Log.d(TAG, "***save state***");
+        super.onSaveInstanceState(outState);
+    }
+
+
+
+    @Override
     public void onBackPressed() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Do want to exit app?");
+        builder.setMessage("Do you want to exit app?");
         builder.setCancelable(true);
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -99,17 +105,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         alertDialog.show();
     }
 
-    Cursor fetchWishList(){
-        return getContentResolver().query(MovieContract.MovieList.CONTENT_URI,
-                null,
-                null,
-                null,
-                null);
-    }
-
-    public boolean connectionAvailability(){
+    public boolean connectionAvailability() {
         ConnectivityManager cm =
-                (ConnectivityManager)currentContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) currentContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
@@ -119,54 +117,57 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.item_menu,menu);
+        getMenuInflater().inflate(R.menu.item_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        id = item.getItemId();
 
-        int id = item.getItemId();
-
-        if (id == R.id.mostpopular_button){
+        if (id == R.id.mostpopular_button) {
             if (connectionAvailability()) {
                 networkMessage.setVisibility(View.INVISIBLE);
                 movieDetailsArrayLists.clear();
                 new FetchMovies(currentContext).execute(mostpopular);
                 movieAdapter.notifyDataSetChanged();
                 return true;
-            }
-            else {
+            } else {
                 networkMessage.setVisibility(View.VISIBLE);
             }
-        }
-        else if(id == R.id.highrated_button){
+        } else if (id == R.id.highrated_button) {
             if (connectionAvailability()) {
                 networkMessage.setVisibility(View.INVISIBLE);
                 movieDetailsArrayLists.clear();
                 new FetchMovies(currentContext).execute(toprated);
                 movieAdapter.notifyDataSetChanged();
                 return true;
-            }
-            else {
+            } else {
                 networkMessage.setVisibility(View.VISIBLE);
             }
         }
-        else if(id == R.id.wishlist_button){
-            movieDetailsArrayLists.clear();
+
+        if (id == R.id.upcoming_button) {
             if (connectionAvailability()) {
                 networkMessage.setVisibility(View.INVISIBLE);
                 movieDetailsArrayLists.clear();
-                wishListAdapter = new WishListAdapter(this,fetchWishList(),0);
-                listView.setAdapter(wishListAdapter);
-                wishListAdapter.notifyDataSetChanged();
+                new FetchMovies(currentContext).execute(upcoming);
                 movieAdapter.notifyDataSetChanged();
                 return true;
-            }
-            else {
+            } else {
                 networkMessage.setVisibility(View.VISIBLE);
-                listView.setAdapter(wishListAdapter);
+            }
+        } else if (id == R.id.wishlist_button) {
+            if (connectionAvailability()) {
+                //networkMessage.setVisibility(View.INVISIBLE);
+                Intent intent = new Intent(this, WishListActivity.class);
+                startActivity(intent);
+                return true;
+            } else {
+                //networkMessage.setVisibility(View.VISIBLE);
+                Intent intent = new Intent(this, WishListActivity.class);
+                startActivity(intent);
                 return true;
             }
         }
@@ -175,13 +176,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        if(connectionAvailability()){
+        if (connectionAvailability()) {
             networkMessage.setVisibility(View.INVISIBLE);
-            Intent intent = new Intent(this,MovieDetailsActivity.class);
+            Intent intent = new Intent(this, MovieDetailsActivity.class);
             intent.putExtra("MOVIE_DETAILS", (Parcelable) adapterView.getItemAtPosition(i));
             startActivity(intent);
-        }
-        else {
+        } else {
             networkMessage.setVisibility(View.VISIBLE);
         }
     }
@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 JSONArray jsonArray = jsonObject.getJSONArray("results");
 
-                for (int i = 0; i<jsonArray.length(); i++){
+                for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject object = jsonArray.getJSONObject(i);
                     MovieDetails movieDetails = new MovieDetails();
                     movieDetails.setId(object.getInt("id"));
@@ -240,8 +240,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     movieDetailsArrayLists.add(movieDetails);
                 }
 
-                movieAdapter = new MovieAdapter(MainActivity.this,movieDetailsArrayLists);
+                movieAdapter = new MovieAdapter(MainActivity.this, movieDetailsArrayLists);
                 gridView.setAdapter(movieAdapter);
+
 
             } catch (JSONException e) {
                 e.printStackTrace();

@@ -22,10 +22,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".MovieDetailsActivity" />
+
         <provider
+            android:name=".MovieWishListContentProvider"
             android:authorities="com.example.abarno.moviesapp_2"
-            android:name="com.example.abarno.moviesapp_2.MovieWishListContentProvider"
-            android:exported="false"/>
+            android:exported="false" />
+
+        <activity android:name=".WishListActivity"></activity>
     </application>
 
 </manifest>

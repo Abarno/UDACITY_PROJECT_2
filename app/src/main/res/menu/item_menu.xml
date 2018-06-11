@@ -7,6 +7,12 @@
     <item
         android:id="@+id/wishlist_button"
         android:title="@string/wish_list"
+        android:orderInCategory="3"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/upcoming_button"
+        android:title="@string/upcoming_movies"
         android:orderInCategory="2"
         app:showAsAction="never"/>
 
